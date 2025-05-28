@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Boots Bonus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.7);
+    }
+    h2 {
+      color: #00ff88;
+      margin-bottom: 20px;
+    }
+    .info {
+      margin: 16px 0;
+      font-size: 18px;
+    }
+    button {
+      background: #00cc66;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+    .back-btn {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Kunlik Boots Bonus</h2>
+    <div class="info" id="bonusInfo">Tekshirilmoqda...</div>
+    <button id="claimBtn" disabled>Bonusni olish</button>
+    <a href="index.html"><button class="back-btn">Ortga</button></a>
+  </div>
+
+  <script>
+    const bonusMin = 500;
+    const bonusMax = 5000;
+    const bonusStep = 100;
+    const claimDelay = 24 * 60 * 60 * 1000;
+
+    const claimBtn = document.getElementById("claimBtn");
+    const bonusInfo = document.getElementById("bonusInfo");
+
+    const lastClaim = parseInt(localStorage.getItem("bootsLastClaim")) || 0;
+    let currentBonus = parseInt(localStorage.getItem("bootsCurrentAmount")) || bonusMin;
+
+    const now = Date.now();
+    const canClaim = now - lastClaim >= claimDelay;
+
+    if (canClaim) {
+      bonusInfo.innerText = `Bugungi boots bonusingiz: ${currentBonus} XP`;
+      claimBtn.disabled = false;
+    } else {
+      const nextTime = lastClaim + claimDelay;
+      const diff = nextTime - now;
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      bonusInfo.innerText = `Keyingi bonusga: ${hours} soat ${minutes} daqiqa qoldi`;
+    }
+
+    claimBtn.addEventListener("click", () => {
+      alert(`Tabriklaymiz! Siz ${currentBonus} 🍉 boots oldingiz!`);
+      localStorage.setItem("bootsLastClaim", Date.now());
+
+      // Arbuzlarga bonusni qo‘shish
+      let currentWatermelons = parseInt(localStorage.getItem("watermelons")) || 0;
+      currentWatermelons += currentBonus;
+      localStorage.setItem("watermelons", currentWatermelons);
+
+      // Keyingi bonusni tayyorlash
+      let nextBonus = currentBonus + bonusStep;
+      if (nextBonus > bonusMax) nextBonus = bonusMin;
+      localStorage.setItem("bootsCurrentAmount", nextBonus);
+
+      bonusInfo.innerText = "Bonus olindi! Ertaga qaytib keling.";
+      claimBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Profil</title>
+<style>
+  body { background: #ffe5d9; font-family: Arial; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+  .container { background: #fff1f0; padding:30px; border-radius:10px; width:320px; box-shadow: 0 0 15px #e27d60; text-align:center; }
+  .info { font-size:18px; color:#e27d60; margin:15px 0; }
+  button {
+    background:#e27d60;
+    border:none;
+    padding:12px 20px;
+    border-radius:5px;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+    margin:10px 5px;
+    width:40%;
+  }
+  button:hover { background:#d45d40; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>Mening Profilim</h2>
+    <div class="info"><strong>Login:</strong> <span id="showLogin">...</span></div>
+    <div class="info"><strong>Parol:</strong> <span id="showPassword">...</span></div>
+    <div>
+      <button id="backBtn">Orqaga</button>
+      <button id="loginPageBtn">Login sahifasi</button>
+    </div>
+  </div>
+
+<script>
+  const storedLogin = localStorage.getItem('userLogin') || 'Login mavjud emas';
+  const storedPassword = localStorage.getItem('userPassword') || 'Parol mavjud emas';
+
+  document.getElementById('showLogin').textContent = storedLogin;
+  document.getElementById('showPassword').textContent = storedPassword;
+
+  document.getElementById('backBtn').onclick = () => {
+    window.location.href = 'index.html';
+  };
+
+  document.getElementById('loginPageBtn').onclick = () => {
+    window.location.href = 'login.html';
+  };
+</script>
+</body>
+</html>

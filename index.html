@@ -1,0 +1,254 @@
+<!-- asosiy.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clicker Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #000d1a, #001a33);
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+    .top-bar {
+      background-color: #1e1e1e;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #56ff87;
+    }
+    .watermelon-total {
+      font-size: 24px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .profile-tag {
+      background-color: #2c2c2c;
+      border-radius: 12px;
+      padding: 5px 10px;
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .status-info {
+      margin-top: 8px;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+    .main-sticker {
+      margin: 25px auto 20px;
+      width: 240px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .energy-bar-container {
+      margin: 20px auto;
+      max-width: 90%;
+    }
+    .energy-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .energy-bar {
+      height: 12px;
+      background: linear-gradient(to right, #ff0000, #ffff00, #00ff00);
+      border-radius: 6px;
+      transition: width 0.3s;
+    }
+    .bottom-buttons {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background-color: #111;
+      padding: 10px 0;
+      border-top: 1px solid #444;
+    }
+    .bottom-buttons div {
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #ccc;
+      cursor: pointer;
+    }
+    .bottom-buttons img {
+      width: 24px;
+      margin-bottom: 4px;
+    }
+    .floating-text {
+      position: absolute;
+      color: #56ff87;
+      font-size: 16px;
+      pointer-events: none;
+      opacity: 1;
+      animation: floatUp 1s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-50px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">⚫🌟🔥🍉🔥🌟⚫</div>
+
+  <div class="watermelon-total">
+    🍉 <span id="arbuz-number">0</span>
+  </div>
+
+  <div class="profile-tag">
+    <span id="clock">--:--:--</span>
+  </div>
+
+  <div class="status-info">
+    <p>Avto: <span id="autoClickRate">0</span> / sek</p>
+    <p>Qoʻlda: <span id="manualClickPower">1</span> / bosish</p>
+    <p>Energiya: +<span id="energyRegenRate">0.1</span> / sek</p>
+  </div>
+
+  <img class="main-sticker" id="clickable-img" src="1.jpg" alt="🍉" />
+
+  <div class="energy-bar-container">
+    <div class="energy-stats">
+      <div id="energy-text">1000/1000</div>
+      <div>+1 sek</div>
+    </div>
+    <div class="energy-bar" id="energy-bar"></div>
+  </div>
+
+  <div class="bottom-buttons">
+    <div onclick="window.location.href='shop.html';">
+      <img src="3.jpg" alt="" />Shop
+    </div>
+    <div onclick="window.location.href='zadanya.html';">
+      <img src="4.jpg" alt="" />Kundalik bonus
+    </div>
+    
+    <div onclick="window.location.href='profil.html';">
+      <img src="10.jpg" alt="" />PROFIL
+    </div>
+  
+
+  <script>
+const currentUser = localStorage.getItem("loggedInUser");
+  if (!currentUser) {
+    window.location.href = "login.html";
+  }
+  function formatNumber(num) {
+    if (num >= 1e18) return (num / 1e18).toFixed(2) + 'E';
+    if (num >= 1e15) return (num / 1e15).toFixed(2) + 'P';
+    if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+    if (num >= 1e9)  return (num / 1e9).toFixed(2) + 'B';
+    if (num >= 1e6)  return (num / 1e6).toFixed(2) + 'M';
+    if (num >= 1e3)  return (num / 1e3).toFixed(2) + 'K';
+    return Math.floor(num);
+  }
+
+  let arbuz = parseInt(localStorage.getItem('watermelons')) || 0;
+  let energy = parseFloat(localStorage.getItem('energy')) || 1000;
+  let clickPower = parseInt(localStorage.getItem('clickPower')) || 1;
+  let autoClicker = parseInt(localStorage.getItem('autoClicker')) || 0;
+  let energyRegen = parseFloat(localStorage.getItem('energyRegen')) || 0.1;
+
+  const arbuzNumber = document.getElementById('arbuz-number');
+  const energyBar = document.getElementById('energy-bar');
+  const energyText = document.getElementById('energy-text');
+  const autoClickRate = document.getElementById('autoClickRate');
+  const manualClickPower = document.getElementById('manualClickPower');
+  const energyRegenRate = document.getElementById('energyRegenRate');
+  const sticker = document.getElementById('clickable-img');
+
+  function updateStatus() {
+    arbuzNumber.textContent = formatNumber(arbuz);
+    autoClickRate.textContent = autoClicker;
+    manualClickPower.textContent = clickPower;
+    energyRegenRate.textContent = energyRegen.toFixed(1);
+  }
+
+  function updateEnergyBar() {
+    energyText.textContent = `${Math.floor(energy)}/1000`;
+    energyBar.style.width = (energy / 1000 * 100) + '%';
+  }
+
+  function handleClick(e) {
+    if (energy >= 1) {
+      arbuz += clickPower;
+      energy -= 1;
+      localStorage.setItem('watermelons', arbuz);
+      localStorage.setItem('energy', energy);
+      updateStatus();
+      updateEnergyBar();
+
+      const float = document.createElement('div');
+      float.className = 'floating-text';
+      float.textContent = `+${clickPower}`;
+      document.body.appendChild(float);
+      float.style.left = e.pageX + 'px';
+      float.style.top = e.pageY + 'px';
+      setTimeout(() => float.remove(), 1000);
+    } else {
+      alert('Energiya yetarli emas!');
+    }
+  }
+
+  function gameLoop() {
+    if (energy >= 1000 && autoClicker > 0) {
+      arbuz += autoClicker;
+      localStorage.setItem('watermelons', arbuz);
+    }
+
+    if (energy < 1000) {
+      energy += energyRegen;
+      if (energy > 1000) energy = 1000;
+      localStorage.setItem('energy', energy);
+    }
+
+    updateStatus();
+    updateEnergyBar();
+    localStorage.setItem('lastSave', Date.now());
+  }
+
+  function offlineProgress() {
+    const now = Date.now();
+    const lastSave = parseInt(localStorage.getItem('lastSave')) || now;
+    const secondsPassed = Math.min(86400, Math.floor((now - lastSave) / 1000));
+
+    if (energy >= 1000 && autoClicker > 0) {
+      arbuz += autoClicker * secondsPassed;
+    } else {
+      energy += energyRegen * secondsPassed;
+      if (energy > 1000) energy = 1000;
+    }
+
+    localStorage.setItem('watermelons', arbuz);
+    localStorage.setItem('energy', energy);
+    localStorage.setItem('lastSave', now);
+  }
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('uz-UZ');
+  }
+
+  sticker.addEventListener('click', handleClick);
+  offlineProgress();
+  updateStatus();
+  updateEnergyBar();
+  updateClock();
+  setInterval(updateClock, 1000);
+  setInterval(gameLoop, 1000); // 1 soniyada bir ishlaydi
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Kirish</title>
+  <style>
+    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #e3f2fd; }
+    .container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; }
+    input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+    button { width: 100%; padding: 10px; background: #42a5f5; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1e88e5; }
+    .link-btn { background: none; color: #42a5f5; text-decoration: underline; cursor: pointer; border: none; padding: 10px 0; width: 100%; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Tizimga kirish</h2>
+    <input type="text" id="loginUsername" placeholder="Username">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button onclick="login()">Kirish</button>
+    <button class="link-btn" onclick="goToSignup()">Yangi account yaratish</button>
+  </div>
+
+  <script>
+    function login() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      
+      const users = JSON.parse(localStorage.getItem("users") || "{}");
+      if (!users[username] || users[username].password !== password) {
+        return alert("Username yoki parol noto'g'ri.");
+      }
+      localStorage.setItem("loggedInUser", username);
+      window.location.href = "index.html";
+    }
+
+    function goToSignup() {
+      window.location.href = "signup.html";
+    }
+  </script>
+</body>
+</html>
+
+
+

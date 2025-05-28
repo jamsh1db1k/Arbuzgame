@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1e1e1e;
+      color: #fff;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #8b9ff9;
+    }
+
+    .arbuz-count {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .boost-section {
+      margin-top: 40px;
+    }
+
+    h2 {
+      font-size: 24px;
+      color: #8b9ff9;
+      margin: 30px 0 15px;
+      border-bottom: 2px solid #444;
+      padding-bottom: 5px;
+    }
+
+    .boost-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .boost-card {
+      background-color: #2c2c2c;
+      padding: 15px;
+      border-radius: 10px;
+      width: calc(50% - 20px);
+    }
+
+    .boost-card h3 {
+      color: #839ef0;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .boost-card p {
+      margin: 2px 0;
+      font-size: 14px;
+    }
+
+    .boost-card button {
+      background-color: #738fed;
+      color: white;
+      border: none;
+      padding: 8px;
+      margin-top: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .boost-card button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #7e7e7f;
+    }
+
+    .back-btn {
+      display: block;
+      margin: 30px auto 0;
+      background: #444;
+      padding: 10px 20px;
+      border-radius: 6px;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      width: 120px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Shop</h1>
+    <div class="arbuz-count"><strong>Arbuzlar:</strong> <span id="arbuz-count">0</span></div>
+  </header>
+
+  <div class="boost-section">
+    <h2>1. Click Boostlar</h2>
+    <div class="boost-grid" id="click-section"></div>
+
+    <h2>2. Auto Click Boostlar</h2>
+    <div class="boost-grid" id="auto-click-section"></div>
+
+    <h2>3. Energy Boostlar</h2>
+    <div class="boost-grid" id="energy-section"></div>
+  </div>
+
+  <a href="index.html" class="back-btn">EXIT</a>
+
+  <footer>
+    <p>🍉</p>
+  </footer>
+
+  <script>
+    const boosts = {
+      click: Array.from({ length: 10 }, (_, i) => ({
+        name: `Qo‘lda boost ${i + 1}`,
+        basePrice: 500 * (i + 1),
+        power: 1 + i,
+      })),
+      auto: Array.from({ length: 10 }, (_, i) => ({
+        name: `Auto boost ${i + 1}`,
+        basePrice: 1500 * (i + 1),
+        power: 1 + i,
+      })),
+      energy: Array.from({ length: 10 }, (_, i) => ({
+        name: `Energiya boost ${i + 1}`,
+        basePrice: 5000 * (i + 1),
+        power: 0.1 * (i + 1),
+      }))
+    };
+
+    const growthRates = {
+      click: 80,
+      auto: 100,
+      energy: 110
+    };
+
+    let arbuz = parseInt(localStorage.getItem("watermelons")) || 0;
+    document.getElementById("arbuz-count").textContent = arbuz;
+
+    function getLevel(type, index) {
+      return parseInt(localStorage.getItem(`${type}-boost-${index}-lvl`)) || 0;
+    }
+
+    function getPrice(basePrice, level, type) {
+      return Math.floor(basePrice * Math.pow(1 + (growthRates[type] / 100), level));
+    }
+
+    function renderBoosts(sectionId, type, boostsList) {
+      const section = document.getElementById(sectionId);
+      section.innerHTML = '';
+
+      boostsList.forEach((boost, index) => {
+        const level = getLevel(type, index);
+        const price = getPrice(boost.basePrice, level, type);
+
+        const div = document.createElement("div");
+        div.className = "boost-card";
+        div.innerHTML = `
+          <h3>${boost.name}</h3>
+          <p>Daraja: ${level}</p>
+          <p>+${boost.power} qo‘shadi</p>
+          <p>Narxi: ${price.toLocaleString('en-US')} arbuz</p>
+          <button ${arbuz < price ? 'disabled' : ''}>Sotib olish</button>
+        `;
+
+        const btn = div.querySelector("button");
+        btn.addEventListener("click", () => {
+          if (arbuz >= price) {
+            arbuz -= price;
+            localStorage.setItem("watermelons", arbuz);
+
+            if (type === 'click') {
+              let clickPower = parseInt(localStorage.getItem('clickPower')) || 1;
+              clickPower += boost.power;
+              localStorage.setItem('clickPower', clickPower);
+            }
+            if (type === 'auto') {
+              let autoClicker = parseInt(localStorage.getItem('autoClicker')) || 0;
+              autoClicker += boost.power;
+              localStorage.setItem('autoClicker', autoClicker);
+            }
+            if (type === 'energy') {
+              let energyRegen = parseFloat(localStorage.getItem('energyRegen')) || 0.1;
+              energyRegen += boost.power;
+              localStorage.setItem('energyRegen', energyRegen);
+            }
+
+            localStorage.setItem(`${type}-boost-${index}-lvl`, level + 1);
+            alert(`${boost.name} muvaffaqiyatli sotib olindi!`);
+            location.reload();
+          }
+        });
+
+        section.appendChild(div);
+      });
+    }
+
+    renderBoosts("click-section", "click", boosts.click);
+    renderBoosts("auto-click-section", "auto", boosts.auto);
+    renderBoosts("energy-section", "energy", boosts.energy);
+  </script>
+</body>
+</html>

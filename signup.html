@@ -1,0 +1,43 @@
+<!-- signup.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Ro'yxatdan o'tish</title>
+  <style>
+    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #e0f7fa; }
+    .container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; }
+    input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+    button { width: 100%; padding: 10px; background: #26a69a; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1e8881; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Ro'yxatdan o'tish</h2>
+    <input type="text" id="signupUsername" placeholder="Username">
+    <input type="password" id="signupPassword" placeholder="Password">
+    <button onclick="signup()">Ro'yxatdan o'tish</button>
+  </div>
+
+  <script>
+    function signup() {
+      const username = document.getElementById('signupUsername').value.trim();
+      const password = document.getElementById('signupPassword').value.trim();
+      
+      if (!username || !password) return alert("Iltimos, barcha maydonlarni to'ldiring.");
+
+      const users = JSON.parse(localStorage.getItem("users") || "{}");
+      if (users[username]) return alert("Bu username allaqachon mavjud.");
+
+      users[username] = { password };
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("Muvaffaqiyatli ro'yxatdan o'tdingiz!");
+      localStorage.setItem("loggedInUser", username);
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
+
+
